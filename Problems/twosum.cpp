@@ -2,19 +2,16 @@
 using namespace std;
 
 vector<int> twoSum(vector<int>& v, int target) {
-	vector<int> result;
-	unordered_map<int, int> prevElems;
-	for (int i = 0; i < v.size(); i++) {
-		auto finder = prevElems.find(target - v[i]);
-		if (finder != prevElems.end()) {
-			result.push_back(finder->second);
-			result.push_back(i);
-			break;
-		}
-		else {
-			prevElems.insert({v[i], i});
-		}
-	}
+	vector<int> result;                                      // To store the two indices
+	unordered_map<int, int> mpElems;                         // To hash visited elements so that they can be looked-up in O(1)
+	for (int i = 0; i < v.size(); i++) {                     // Looping over the input array to look for v[j] + v[i] = target
+		if (mpElems.find(target - v[i]) != mpElems.end()) {  // For a particular v[i], if (target - v[i]) exists in the visited elements
+			result.push_back(mpElems[target - v[i]]);        // then we find the two elements at indices given by mp[target - v[i]] and i
+			result.push_back(i);                             // mp[target - v[i]] is always lower than i since mp has previously visited elements
+			break;                                           // Must break the loop once the two elements are found
+		}                                                    // We can easily look for complement elements in the hashmap in O(1)
+		mpElems[v[i]] = i;                                   // Store {v[i]: i} if a complement is not found for v[i] in the map
+	}                                                        // The hashmap key is the element and hashmap value is the index of the element
 	return result;
 }
 
