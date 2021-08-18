@@ -1,9 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Method 1:- Using a set of vectors along with the 2-ptr approach
+// Method 1:- Using set of vectors along with the 2-ptr approach
 
-vector<vector<int>> fourSum1(vector<int>& v, int target) {            // Naive O(N^3) solution
+vector<vector<int>> fourSumNaive(vector<int>& v, int target) {        // Naive O(N^3) solution
 	set<vector<int>> result;                                          // Set to store unique quadruplet (vector) results
 	sort(v.begin(), v.end());                                         // Sorting the input array since indices of quadruplets not required
 
@@ -74,6 +74,8 @@ vector<vector<int>> fourSumNoSet(vector<int>& v, int target) {
 
 // Method 3:- Using 2-pointers and a hashmap to hash prev. visited elemens
 // Does not work for some test cases containing duplicate elements due to duplicate keys
+// We can use chaining of hashmap values using a linked list to avoid duplicate keys
+// Values for the same key are chained together using a linked list or a vector
 // Similar to the hashing approach for the 2-Sum Problem
 
 vector<vector<int>> fourSumHash(vector<int>& v, int target) {          // Hashing might not work in the case of duplicates in the array
@@ -98,6 +100,52 @@ vector<vector<int>> fourSumHash(vector<int>& v, int target) {          // Hashin
 			i++;
 	}
 	return result;
+}
+
+// Method 4:- Hashmap along with chaining index pairs with same sum, worst case O(N^4)
+// (v[k] + v[l]) = target - (v[i] + v[j]) --> Two parallel 2-Sum problems
+// We can find the 2-Sum for all pairs (k, l) and hash it using the sum as keys and pairs as values
+// Pairs with the same 2-Sum can be chained together with the 2-Sum key using a vector<pair<int, int>>
+// After hashing, we can initiate search for (i, j) using 2 loops where target - v[i] - v[j] is present in the map
+// In the best case, we'll get 1 pair per 2-Sum key, requiring O(1) traversal inside O(N^2) for loops
+// In the worst case, all the N^2 pairs are there in a single key, requiring O(N^2) traversal inside O(N^2) loops
+
+
+vector<vector<int>> fourSum(vector<int>& v, int target) {
+	vector<vector<int>> res;
+	int n = v.size();
+	if (n < 4)
+		return res;
+
+	sort(v.begin(), v.end());                                          // Sorting to get output quadruplets in sorted order
+	unordered_map<int, vector<pair<int, int>>> mp;                     // Key->sum and Value->(k, l) pair of indices where k < l
+
+	for (int i = 0; i < n - 1; ++i)                                    // Storing all 2-sum pairs in a map, where key -> sum and value -> index pairs
+		for (int j = i + 1; j < n; ++j)                                // Index pairs with the same 2-sum are chained together in a vector<pair<int,int>>
+			mp[v[i] + v[j]].push_back(make_pair(i, j));                // mp[..] is a vector of pairs, where we chain the new index pair for the given sum
+
+	for (int i = 0; i < n - 1; ++i) {
+		if (i > 0 and v[i] == v[i - 1])                                // Jumping over consecutive duplicate elements
+			continue;
+		for (int j = i + 1; j < n; ++j) {
+			if (j > i + 1 and v[j] == v[j - 1])                        // Jumping over consecutive duplicate elements
+				continue;
+			int sum = target - v[i] - v[j];                            // Looking for the other 2-Sum for the current pair (i, j) in the hashmap
+			if (mp.find(sum) != mp.end()) {                            // All the (k, l) pairs chained to this 2-sum key might be valid for (i, j, k, l)
+				for (auto it : mp[sum])    {                           // Iterating over the vector<pair<int, int>> to try all the (k, l) pairs
+					int k = it.first;
+					int l = it.second;
+					if (k > j) {                                       // Maintain the increasing order of index (i,j,k,l).....i<j<k<l
+						if (!res.empty() and res.back()[0] == v[i] and res.back()[1] == v[j] and res.back()[2] == v[k] and res.back()[3] == v[l])
+							continue;                                  // Skipping duplicate cases and going to the next (k, l) pair
+						vector<int> temp = {v[i], v[j], v[k], v[l]};
+						res.push_back(temp);
+					}
+				}
+			}
+		}
+	}
+	return res;
 }
 
 int main() {
