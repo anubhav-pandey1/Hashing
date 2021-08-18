@@ -111,7 +111,7 @@ vector<vector<int>> fourSumHash(vector<int>& v, int target) {          // Hashin
 // In the worst case, all the N^2 pairs are there in a single key, requiring O(N^2) traversal inside O(N^2) loops
 
 
-vector<vector<int>> fourSum(vector<int>& v, int target) {
+vector<vector<int>> fourSumHashChain(vector<int>& v, int target) {
 	vector<vector<int>> res;
 	int n = v.size();
 	if (n < 4)
