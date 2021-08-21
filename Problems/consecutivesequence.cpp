@@ -6,7 +6,7 @@ using namespace std;
 // No, it is not. Since we remove elements from the set once done and check for v[i] at the start of an iteration
 
 int longestConsecutiveSequences(vector<int>& v) {
-	set<int> elems(v.begin(), v.end());                      // Create a set copy of the vector in O(N)
+	unordered_set<int> elems(v.begin(), v.end());            // Create a set copy of the vector in O(N)
 	int maxSize = 0;                                         // Initialize maxSize = 0 when vector size = 0
 	for (int i = 0; i < v.size(); i++) {                     // Iterate over the vector elements one by one in O(N)
 		if (elems.find(v[i]) != elems.end()) {               // Check if v[i] exists in the set -> It is not yet utilised for a streak
@@ -35,7 +35,7 @@ int longestConsecutiveSequences(vector<int>& v) {
 // This method makes us check all elements only once
 
 int longestConsecutiveSequence(vector<int>& v) {
-	set<int> elems(v.begin(), v.end());
+	unordered_set<int> elems(v.begin(), v.end());           // Use unordered_set for O(1) retrieval
 	int maxSize = 0;
 	for (int i = 0; i < v.size(); i++) {
 		if (elems.find(v[i] - 1) != elems.end())            // Checking if v[i] is not a starting point of a streak
