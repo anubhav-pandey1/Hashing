@@ -1,12 +1,21 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Precomputation is useful when we can calculate the "ground truth" or a portion of it beforehand..
+// ..to be used across multiple test cases ie. when the inputs are fixed in nature (factorials of ints..
+// ..or fibonacci numbers or a given fixed matrix across all test cases) but the queries/outputs are different.
+
+// Given constraints:-
+// 1 <= T <= 10^5
+// 1 <= N <= 10^5
+// M = 10^9+7
+
 const int M = 1e9 + 7;                          // Prime for modulo operation
-const int maxNum = 1e5 + 1;                     // Max value of n is 10^5
+const int maxNum = 1e5 + 1;                     // Max value of N is 10^5
 
 // Method 1:- Precomputing all the factorials and hashing using an array
 
-vector<int> prevFacts(maxNum, -1);              // Array for hashing
+vector<int> prevFacts(maxNum, -1);              // Array for hashing precomputed factorials
 
 void preComputeAll() {
 	prevFacts[0] = 1, prevFacts[1] = 1;         // Function to execute the precomputation
@@ -17,7 +26,7 @@ void preComputeAll() {
 	}
 }
 
-int hashedFactorialAll(int n) {
+int hashedFactorial(int n) {
 	if (prevFacts[n] != -1)                     // If factorial(n) is found in the precomputed array
 		return prevFacts[n];
 
@@ -29,7 +38,11 @@ int hashedFactorialAll(int n) {
 	return fact;
 }
 
-// Method 2:- Precomputing some factorials and hashing them as you compute - Hash as you go
+// This technique takes O(N) for precomputation and O(1*T) for accessing precomputed factorial for all T cases
+// Since N and T are almost similar (if input sorted), TC = O(N) + O(T) ~= O(2N) ~= O(N)
+
+// Method 2:- WILL NOT WORK
+// Precomputing some factorials and hashing them as you compute - Hash as you go
 // Using the nearest precomputed factorial to start the calculation instead of starting from 1
 // Using floor binary search to find the nearest precomputed factorial in the array
 // WON'T WORK: Array will be interspersed with -1s, despite having other values in sorted order
@@ -47,11 +60,11 @@ int main() {
 
 	int testNum;
 	cin >> testNum;
+	preComputeAll();                            // Precompute once since factorials fixed for all testcases
 	while (testNum--) {
 		int num;
 		cin >> num;
-		preComputeAll();
-		cout << hashedFactorial(num) << endl;
+		cout << hashedFactorial(num) << endl;   // Access precomputed factorials in O(1) for each testcase
 	}
 	return 0;
 }
